@@ -24,6 +24,9 @@ if st.button("Scrape and Export"):
             driver.get(playlist_url)
             metadata = get_playlist_metadata(driver, wait)
             track_data = get_track_data(driver, wait, song_index+1)
+        except Exception as e:
+            st.error(f"An error occurred: ")
+            driver.quit()
         finally:
             driver.quit()
         output_path = "outputs/Spotify_Playlist_Export.xlsx"
