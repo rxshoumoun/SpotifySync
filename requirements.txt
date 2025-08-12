@@ -1,0 +1,7 @@
+selenium 
+beautifulsoup4
+requests
+streamlit
+pandas
+numpy
+openpyxl

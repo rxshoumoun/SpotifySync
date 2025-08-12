@@ -25,6 +25,8 @@ def get_playlist_metadata(driver, wait):
     """
     playlist_name = wait.until(EC.presence_of_element_located(
         (By.XPATH, "//h1[contains(@class, 'encore-text-headline-large')]"))).text
+    user = wait.until(EC.presence_of_element_located(
+        (By.XPATH, "//div[contains(@class, 'RANLXG3qKB61Bh33I0r2')]"))).text
     desc_el = wait.until(EC.presence_of_element_located(
         (By.XPATH, "//span[contains(@class, 'encore-text-body-small')]/div"))).text
     saves = driver.find_element(By.XPATH, "//span[contains(@class, 'w1TBi3o5CTM7zW1EB3Bm')]").text
@@ -33,8 +35,9 @@ def get_playlist_metadata(driver, wait):
     return {
         "Playlist Name": playlist_name,
         "Description": desc_el if desc_el else "",
-        "Total Saves": saves,
-        "Number of Songs": song_count,
+        "By User": user if user else "",
+        "Total Saves":  saves if saves else "0",
+        "Number of Songs": song_count if song_count else "0",
         "Total Duration": duration
     }
 
@@ -45,13 +48,30 @@ def scroll_to_load(driver, seconds=10):
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     time.sleep(seconds)
 
-def get_track_data(driver, wait):
+def scroll_to_load_all_tracks(driver, wait, pause_time=1.5, max_attempts=30):
+    """
+    Scrolls to the bottom of the playlist until all tracks are loaded.
+    """
+    last_height = driver.execute_script("return document.body.scrollHeight")
+    attempts = 0
+    while attempts < max_attempts:
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(pause_time)
+        new_height = driver.execute_script("return document.body.scrollHeight")
+        # Wait for new rows to load
+        rows = driver.find_elements(By.XPATH, "//div[@role='row' and .//div[@aria-colindex='2']]")
+        if new_height == last_height:
+            break
+        last_height = new_height
+        attempts += 1
+
+def get_track_data(driver, wait,last_index):
     """
     Extract track data from the playlist page.
     Returns a list of dictionaries, one per track.
     """
-    scroll_to_load(driver)
-    rows = driver.find_elements(By.XPATH, "//div[@role='row' and .//div[@aria-colindex='2']]")[:21]
+    scroll_to_load_all_tracks(driver, wait)
+    rows = driver.find_elements(By.XPATH, "//div[@role='row' and .//div[@aria-colindex='2']]")[:last_index if last_index else 21]
     data = []
     error_count = 0
     for idx, row in enumerate(rows):

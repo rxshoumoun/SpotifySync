@@ -12,14 +12,16 @@ def main():
         sys.exit(1)
 
     url = sys.argv[1]
+    index = int(input("Enter the number of tracks to scrape (default 20): "))
+    head = input("Run in headless mode? (y/n): ").strip().lower() == 'y'
     print(f"Scraping: {url}")
-    driver = setup_driver(headless=False)
+    driver = setup_driver(headless=False if not head else True)
     wait = WebDriverWait(driver, 20)
 
     try:
         driver.get(url)
         metadata = get_playlist_metadata(driver, wait)
-        track_data = get_track_data(driver, wait)
+        track_data = get_track_data(driver, wait,last_index=index+1)
     finally:
         driver.quit()
 
