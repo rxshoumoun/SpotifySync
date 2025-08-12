@@ -39,3 +39,13 @@ if st.button("Scrape and Export"):
                 file_name="Spotify_Playlist_Export.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
+
+st.markdown(
+    """
+    <hr style="margin-top:2em;margin-bottom:1em;">
+    <div style="text-align:center; color:gray; font-size:0.9em;">
+        &copy; 2025 Rxshoumoun. All rights reserved.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
